@@ -67,7 +67,7 @@ const ChattingPage = () => {
       </div>
 
       {/* Input Container */}
-      <div className="flex items-center p-4 bg-white border-t border-gray-300 sticky bottom-0 w-full">
+      <div className="flex items-center p-4 bg-white border-t border-gray-300 fixed bottom-0 w-full">
         <input
           type="text"
           value={newMessage}
