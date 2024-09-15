@@ -42,7 +42,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   return (
-    <div className=" bg-gray-100 flex flex-col">
+    <div className=" bg-gray-100 flex flex-col w-full">
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {loading ? (
@@ -50,7 +50,7 @@ const Dashboard = () => {
             <div className="text-lg font-semibold">Loading...</div>
           </div>
         ) : (
-          <div className="container mx-auto p-6">
+          <div className="container mx-auto ">
             {usersDataLoading ? (
               <div className="flex items-center justify-center h-full text-gray-700">
                 <div className="text-lg font-semibold">Loading users...</div>

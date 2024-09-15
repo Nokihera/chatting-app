@@ -43,7 +43,7 @@ const ChattingPage = () => {
   return (
     <>
       {/* Messages Container */}
-      <div className="flex-grow-2 h-[370px] md:h-[450px] overflow-y-auto p-4">
+      <div className="flex-grow-2 p-4 w-full">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500">No messages yet</div>
         ) : (
@@ -67,7 +67,7 @@ const ChattingPage = () => {
       </div>
 
       {/* Input Container */}
-      <div className="flex items-center p-4 bg-white border-t border-gray-300 mt-auto">
+      <div className="flex items-center p-4 bg-white border-t border-gray-300 sticky bottom-0 w-full">
         <input
           type="text"
           value={newMessage}

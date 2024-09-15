@@ -16,7 +16,7 @@ const Heading = () => {
     };
 
     return (
-        <header className="bg-blue-600 text-white py-4 px-6 shadow-md">
+        <header className="bg-blue-600 text-white py-4 px-6 shadow-md sticky top-0 w-full">
         <div className="container mx-auto flex items-center justify-between">
           <Link to="/" className="text-2xl font-semibold">ChatterVibe</Link>
           <button
