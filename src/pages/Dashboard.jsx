@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { app, db } from "../config/firebase";
 import { getAuth } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
-import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 
 const Dashboard = () => {
   const auth = getAuth(app);
@@ -11,6 +11,13 @@ const Dashboard = () => {
   const [usersDataLoading, setUsersDataLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const currentUser = auth.currentUser;
+
+  // Request notification permission on component mount
+  useEffect(() => {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   useEffect(() => {
     const fetchUsersWithLastMessage = async () => {
@@ -25,6 +32,23 @@ const Dashboard = () => {
             // Query the last message in each chat
             const messageCollection = collection(db, `chats/${chatId}/messages`);
             const messageQuery = query(messageCollection, orderBy("timestamp", "desc"), limit(1));
+
+            // Listen for real-time updates to messages
+            onSnapshot(messageQuery, (snapshot) => {
+              snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                  const newMessage = change.doc.data();
+                  // Trigger notification for new message if it's from another user
+                  if (newMessage.uid !== currentUser?.uid && Notification.permission === "granted") {
+                    new Notification("New message", {
+                      body: newMessage.text,
+                      icon: "../assets/notification-icon.png", // Replace with your notification icon
+                    });
+                  }
+                }
+              });
+            });
+
             const messageSnapShot = await getDocs(messageQuery);
             const lastMessage = messageSnapShot.docs.length
               ? messageSnapShot.docs[0].data().text
