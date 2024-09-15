@@ -42,7 +42,7 @@ const Dashboard = () => {
                   if (newMessage.uid !== currentUser?.uid && Notification.permission === "granted") {
                     new Notification("New message", {
                       body: newMessage.text,
-                      icon: "../assets/notification-icon.png", // Replace with your notification icon
+                      icon: "../assets/notification-icon.svg", // Replace with your notification icon
                     });
                   }
                 }
