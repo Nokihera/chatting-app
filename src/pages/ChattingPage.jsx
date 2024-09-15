@@ -43,7 +43,7 @@ const ChattingPage = () => {
   return (
     <>
       {/* Messages Container */}
-      <div className="flex-grow-2 h-[470px] overflow-y-auto p-4">
+      <div className="flex-grow-2 h-[370px] md:h-[450px] overflow-y-auto p-4">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500">No messages yet</div>
         ) : (
