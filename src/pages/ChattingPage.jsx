@@ -1,5 +1,5 @@
 import { getAuth } from "firebase/auth";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { app, db } from "../config/firebase";
 import { collection, onSnapshot, orderBy, query, addDoc, serverTimestamp } from "firebase/firestore";
@@ -12,6 +12,14 @@ const ChattingPage = () => {
   const { id } = useParams();
   const chatId = [id, currentUser?.uid].sort().join("_");
 
+  // Create a ref for the message container
+  const messagesEndRef = useRef(null);
+
+  // Auto-scroll function
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   useEffect(() => {
     const messageCollection = collection(db, `chats/${chatId}/messages`);
     const q = query(messageCollection, orderBy("timestamp", "asc"));
@@ -21,6 +29,8 @@ const ChattingPage = () => {
         ...doc.data(),
       }));
       setMessages(fetchedMessages);
+      // Scroll to bottom whenever messages change
+      scrollToBottom();
     });
     return () => unsubscribe();
   }, [chatId]);
@@ -43,16 +53,14 @@ const ChattingPage = () => {
   return (
     <>
       {/* Messages Container */}
-      <div className="flex-grow-2 p-4 w-full mb-20">
+      <div className="flex-grow-2 p-4 w-full mb-20 overflow-auto" style={{ maxHeight: "80vh" }}>
         {messages.length === 0 ? (
           <div className="text-center text-gray-500">No messages yet</div>
         ) : (
           messages.map((message) => (
             <div
               key={message.id}
-              className={`mb-4 flex ${
-                message.uid === currentUser.uid ? "justify-end" : "justify-start"
-              }`}
+              className={`mb-4 flex ${message.uid === currentUser.uid ? "justify-end" : "justify-start"}`}
             >
               <div
                 className={`max-w-xs px-4 py-2 rounded-lg text-white ${
@@ -64,6 +72,8 @@ const ChattingPage = () => {
             </div>
           ))
         )}
+        {/* Empty div to ensure auto-scroll to the bottom */}
+        <div ref={messagesEndRef}></div>
       </div>
 
       {/* Input Container */}
