@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { app, db } from "../config/firebase";
 import { getAuth } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 
 const Dashboard = () => {
   const auth = getAuth(app);
@@ -10,25 +10,43 @@ const Dashboard = () => {
   const [usersData, setUsersData] = useState([]);
   const [usersDataLoading, setUsersDataLoading] = useState(true);
   const [loading, setLoading] = useState(true);
+  const currentUser = auth.currentUser;
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUsersWithLastMessage = async () => {
       try {
         const userRef = collection(db, "users");
         const userSnapShot = await getDocs(userRef);
-        const userData = userSnapShot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setUsersData(userData);
+        const usersWithLastMessage = await Promise.all(
+          userSnapShot.docs.map(async (doc) => {
+            const userId = doc.id;
+            const chatId = [userId, currentUser?.uid].sort().join("_");
+
+            // Query the last message in each chat
+            const messageCollection = collection(db, `chats/${chatId}/messages`);
+            const messageQuery = query(messageCollection, orderBy("timestamp", "desc"), limit(1));
+            const messageSnapShot = await getDocs(messageQuery);
+            const lastMessage = messageSnapShot.docs.length
+              ? messageSnapShot.docs[0].data().text
+              : "No messages yet";
+
+            return {
+              id: userId,
+              fullName: doc.data().fullName,
+              lastMessage,
+            };
+          })
+        );
+        setUsersData(usersWithLastMessage);
       } catch (err) {
         console.error("Error fetching users:", err.message);
       } finally {
         setUsersDataLoading(false);
       }
     };
-    fetchUsers();
-  }, []);
+
+    fetchUsersWithLastMessage();
+  }, [currentUser]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -42,7 +60,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   return (
-    <div className=" bg-gray-100 flex flex-col w-full">
+    <div className="bg-gray-100 flex flex-col w-full">
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {loading ? (
@@ -50,7 +68,7 @@ const Dashboard = () => {
             <div className="text-lg font-semibold">Loading...</div>
           </div>
         ) : (
-          <div className="container mx-auto ">
+          <div className="container mx-auto">
             {usersDataLoading ? (
               <div className="flex items-center justify-center h-full text-gray-700">
                 <div className="text-lg font-semibold">Loading users...</div>
@@ -70,7 +88,9 @@ const Dashboard = () => {
                     </div>
                     <div className="ml-4 flex-1">
                       <div className="text-lg font-semibold text-gray-800">{user.fullName}</div>
-                      <div className="text-gray-600 text-sm mt-1">Last message preview or status</div>
+                      <div className="text-gray-600 text-sm mt-1">
+                        {user.lastMessage || "No messages yet"}
+                      </div>
                     </div>
                   </Link>
                 ))}
