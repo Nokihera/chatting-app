@@ -63,11 +63,11 @@ const ChattingPage = () => {
               className={`mb-4 flex ${message.uid === currentUser.uid ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-xs px-4 py-2 rounded-lg text-white ${
+                className={` px-4 py-2 rounded-lg max-w-[200px] text-white ${
                   message.uid === currentUser.uid ? "bg-blue-600" : "bg-gray-400"
                 }`}
               >
-                <p>{message.text}</p>
+                <p className="text-wrap">{message.text}</p>
               </div>
             </div>
           ))
