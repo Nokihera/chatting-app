@@ -3,6 +3,7 @@ import { app, db } from "../config/firebase";
 import { getAuth } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+import Preloader from "../components/Preloader.jsx";
 
 const Dashboard = () => {
   const auth = getAuth(app);
@@ -59,19 +60,32 @@ const Dashboard = () => {
     return () => unsubscribe(); // Clean up subscription on unmount
   }, [navigate]);
 
+  // Skeleton loader component
+  const SkeletonLoader = () => (
+    <div className="animate-pulse flex items-center p-4">
+      <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
+      <div className="ml-4 flex-1 space-y-2">
+        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+        <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="bg-gray-100 flex flex-col w-full">
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex items-center justify-center h-full text-gray-700">
-            <div className="text-lg font-semibold">Loading...</div>
-          </div>
+          <Preloader/>
         ) : (
           <div className="container mx-auto">
             {usersDataLoading ? (
-              <div className="flex items-center justify-center h-full text-gray-700">
-                <div className="text-lg font-semibold">Loading users...</div>
+              // Show multiple skeleton loaders while data is being fetched
+              <div className="divide-y divide-gray-300">
+                <SkeletonLoader />
+                <SkeletonLoader />
+                <SkeletonLoader />
+                <SkeletonLoader />
               </div>
             ) : (
               <div className="divide-y divide-gray-300">
