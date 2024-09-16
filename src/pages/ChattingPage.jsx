@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { app, db } from "../config/firebase";
 import { collection, onSnapshot, orderBy, query, addDoc, serverTimestamp } from "firebase/firestore";
+import { format } from "date-fns"; // Import date-fns to format timestamps
 
 const ChattingPage = () => {
   const auth = getAuth(app);
@@ -48,13 +49,22 @@ const ChattingPage = () => {
       const messageCollection = collection(db, `chats/${chatId}/messages`);
       await addDoc(messageCollection, {
         text: newMessage,
-        timestamp: serverTimestamp(),
+        timestamp: serverTimestamp(), // Store the timestamp
         uid: currentUser.uid,
       });
       setNewMessage("");
     } catch (err) {
       alert(err.message);
     }
+  };
+
+  // Function to format the timestamp
+  const formatTimestamp = (timestamp) => {
+    if (timestamp?.seconds) {
+      const date = new Date(timestamp.seconds * 1000);
+      return format(date, "p"); // Formats time as HH:mm AM/PM
+    }
+    return "";
   };
 
   return (
@@ -75,6 +85,10 @@ const ChattingPage = () => {
                 }`}
               >
                 <p className="text-wrap">{message.text}</p>
+                {/* Display the formatted timestamp */}
+                <p className="text-xs text-gray-200 text-right mt-1">
+                  {formatTimestamp(message.timestamp)}
+                </p>
               </div>
             </div>
           ))
