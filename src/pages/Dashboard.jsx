@@ -79,7 +79,7 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="bg-gray-100 flex flex-col w-full mt-20 mb-10">
+    <div className=" flex flex-col w-full mt-20 mb-10">
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {loading ? (
