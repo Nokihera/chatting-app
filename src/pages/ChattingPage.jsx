@@ -104,7 +104,8 @@ const ChattingPage = () => {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type a message..."
-          className="flex-grow p-2 mr-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="flex-grow p-2 mr-4 rounded-lg outline-none"
+          onKeyDown={(e) => e.key === "Enter" && sendMessageBtn()}
         />
         <button
           onClick={sendMessageBtn}
