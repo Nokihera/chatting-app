@@ -15,7 +15,7 @@ const ChattingPage = () => {
   // Create a ref for the message container
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll function
+  // Auto-scroll function to scroll to the latest message
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -29,11 +29,18 @@ const ChattingPage = () => {
         ...doc.data(),
       }));
       setMessages(fetchedMessages);
-      // Scroll to bottom whenever messages change
-      scrollToBottom();
     });
+
+    // Scroll to the latest message after loading messages
+    scrollToBottom();
+
     return () => unsubscribe();
   }, [chatId]);
+
+  useEffect(() => {
+    // Scroll to the latest message whenever new messages arrive
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessageBtn = async () => {
     if (newMessage.trim() === "") return;
@@ -53,7 +60,7 @@ const ChattingPage = () => {
   return (
     <>
       {/* Messages Container */}
-      <div className="flex-grow-2 p-4 w-full mb-20 overflow-auto" style={{ maxHeight: "80vh" }}>
+      <div className="flex-grow-2 p-4 w-full my-16 overflow-y-auto">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500">No messages yet</div>
         ) : (
@@ -63,7 +70,7 @@ const ChattingPage = () => {
               className={`mb-4 flex ${message.uid === currentUser.uid ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={` px-4 py-2 rounded-lg max-w-[200px] text-white ${
+                className={`px-4 py-2 rounded-lg max-w-[200px] text-white ${
                   message.uid === currentUser.uid ? "bg-blue-600" : "bg-gray-400"
                 }`}
               >

@@ -24,8 +24,15 @@ const Dashboard = () => {
             const chatId = [userId, currentUser?.uid].sort().join("_");
 
             // Query the last message in each chat
-            const messageCollection = collection(db, `chats/${chatId}/messages`);
-            const messageQuery = query(messageCollection, orderBy("timestamp", "desc"), limit(1));
+            const messageCollection = collection(
+              db,
+              `chats/${chatId}/messages`
+            );
+            const messageQuery = query(
+              messageCollection,
+              orderBy("timestamp", "desc"),
+              limit(1)
+            );
             const messageSnapShot = await getDocs(messageQuery);
             const lastMessage = messageSnapShot.docs.length
               ? messageSnapShot.docs[0].data().text
@@ -72,11 +79,11 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="bg-gray-100 flex flex-col w-full">
+    <div className="bg-gray-100 flex flex-col w-full mt-20 mb-10">
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {loading ? (
-          <Preloader/>
+          <Preloader />
         ) : (
           <div className="container mx-auto">
             {usersDataLoading ? (
@@ -101,7 +108,9 @@ const Dashboard = () => {
                       </span>
                     </div>
                     <div className="ml-4 flex-1">
-                      <div className="text-lg font-semibold text-gray-800">{user.fullName}</div>
+                      <div className="text-lg font-semibold text-gray-800">
+                        {user.fullName}
+                      </div>
                       <div className="text-gray-600 text-sm mt-1">
                         {user.lastMessage || "No messages yet"}
                       </div>
